@@ -1,0 +1,22 @@
+01.09 C ПРОСТАЯ ПРОГРАММА ДЛЯ ДЕМОНСТРАЦИИ
+01.10 COMMENT ЭТА ПРОГРАММА ИСПОЛЬЗУЕТ ВСЕ КОМАНДЫ И ФУНКЦИИ
+01.11 ASK "ВВЕДИТЕ ПОЛОЖИТЕЛЬНОЕ ЧИСЛО X: ", X
+01.12 IF (X) 01.13, 01.13, 01.14
+01.13 TYPE "X ДОЛЖНО БЫТЬ >0", !; GO 01.11
+01.14 SET A = FSIN(X)
+01.15 SET B = FCOS(X)
+01.16 SET C = FATN(X)
+01.17 SET D = FEXP(X)
+01.18 SET E = FLOG(X)
+01.19 SET G = FSQT(X)
+01.20 SET H = FITR(X)
+01.21 SET I = FRAN(1)
+01.22 SET J = FABS(X)
+01.23 SET K = FSGN(X)
+01.24 TYPE "РЕЗУЛЬТАТЫ:", !
+01.25 TYPE "FSIN=", A, " FCOS=", B, " FATN=", C, !
+01.26 TYPE "FEXP=", D, " FLOG=", E, " FSQT=", G, !
+01.27 TYPE "FITR=", H, " FRAN=", I, " FABS=", J, " FSGN=", K, !
+01.28 TYPE "ПРОГРАММА ЗАВЕРШЕНА", !
+01.29 ERASE
+01.30 QUIT
