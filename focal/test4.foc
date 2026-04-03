@@ -1,0 +1,5 @@
+10.01 a "Number",size
+10.03 i (size) 10.05, 10.05, 10.10
+10.05 quiz
+10.10 t "List of prime numbers",!
+10.15 s l = 0

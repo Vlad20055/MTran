@@ -13,7 +13,7 @@ class LexicalAnalyzer:
     def peek(self) -> str:
         """
         Completed
-        Возвращает текущий символ без продвижения вперёд, или '' если конец.
+        Возвращает текущий символ без продвижения вперёд, или '' если конец всего кода.
         """
         if self.pos >= len(self.source):
             return ''
@@ -60,7 +60,7 @@ class LexicalAnalyzer:
         at_start = self.start_of_line
         self.start_of_line = False  # текущий токен займёт начало, сбрасываем
 
-        # Сохраняем состояние ожидания команды (оно могло быть от предыдущего токена)
+        # Сохраняем состояние ожидания команды
         expect_cmd = self.expect_command
 
         # Число
@@ -116,7 +116,7 @@ class LexicalAnalyzer:
             return Token(TokenType.DELIMITER_COMMA, ',', start_line, start_col)
         if ch == ';':
             self.advance()
-            self.expect_command = True   # после точки с запятой ожидаем команду
+            self.expect_command = True   # после точки с запятой ожидаем команду0/
             return Token(TokenType.DELIMITER_SEMICOLON, ';', start_line, start_col)
         if ch == '(':
             self.advance()
@@ -134,7 +134,7 @@ class LexicalAnalyzer:
         # Неизвестный символ
         self.advance()
         self.expect_command = False
-        return Token(TokenType.UNKNOWN, ch, start_line, start_col)
+        return Token(TokenType.UNKNOWN, ch, start_line, start_col, "Неизвестный символ")
 
     def read_number(self, line: int, col: int) -> Token:
         """
@@ -159,9 +159,11 @@ class LexicalAnalyzer:
             else:
                 break
         if dot_count > 1:
-            return Token(TokenType.UNKNOWN, num_str, line, col)
+            return Token(TokenType.UNKNOWN, num_str, line, col, "Некорректное число")
+        
         return Token(TokenType.NUMBER, num_str, line, col)
 
+        
     def read_string(self, line: int, col: int) -> Token:
         """
         Completed
@@ -170,13 +172,14 @@ class LexicalAnalyzer:
         quote_char = self.advance()
         value = ''
         while self.pos < len(self.source) and self.peek() != quote_char:
+            if self.peek() == '\n':
+                return Token(TokenType.UNKNOWN, value, line, col, "Незакрытая строка")
             value += self.advance()
         if self.pos < len(self.source):
-            self.advance()  # закрывающая кавычка
+            self.advance()
             return Token(TokenType.STRING, value, line, col)
         else:
-            # Ошибка: незакрытая строка
-            return Token(TokenType.UNKNOWN, value, line, col)
+            return Token(TokenType.UNKNOWN, value, line, col, "Незакрытая строка")
     
 
     def read_identifier(self, line: int, col: int, expect_cmd: bool) -> Token:
@@ -192,7 +195,6 @@ class LexicalAnalyzer:
             # Если не команда, то это идентификатор (синтаксическая ошибка, но лексер пропускает)
             return Token(TokenType.IDENTIFIER, ident, line, col)
         else:
-            # Проверяем, не функция ли это
             func_type = self._get_function_type(ident_up)
             if func_type != TokenType.IDENTIFIER:
                 return Token(func_type, ident, line, col)
@@ -200,7 +202,6 @@ class LexicalAnalyzer:
         
     def _get_command_type(self, ident_up: str) -> TokenType:
         """Возвращает тип команды по первой букве"""
-        # Однобуквенные команды (по первому символу)
         first = ident_up[0] if ident_up else ''
         command_map = {
             'C': TokenType.KEYWORD_COMMENT,

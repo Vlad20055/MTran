@@ -24,8 +24,10 @@ def main():
 """
     lexer = LexicalAnalyzer(source)
     tokens = lexer.tokenize()
-    for tok in tokens:
-        print(tok)
+    for num, tok in enumerate(tokens):
+        # print(f"<ИД_{num + 1}>  {tok.value:<15}   {tok.type}")
+        print(f"<ИД_{num + 1:<3}>  {tok}")
+
 
 if __name__ == "__main__":
     main()

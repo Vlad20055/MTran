@@ -2,26 +2,23 @@ from enum import Enum, auto
 
 class TokenType(Enum):
     # Специальные
-    EOF = auto()          # Конец файла
-    UNKNOWN = auto()      # Неизвестный символ (ошибка)
+    EOF = auto()
+    UNKNOWN = auto()    # Ошибка
     
-    # Номера строк (например, 1.10)
     LINE_NUMBER = auto()
     
-    # Ключевые слова (однобуквенные и многосимвольные)
-    KEYWORD_COMMENT = auto()   # C
-    KEYWORD_ASK = auto()       # A
-    KEYWORD_TYPE = auto()      # T
-    KEYWORD_SET = auto()       # S
-    KEYWORD_IF = auto()        # I
-    KEYWORD_FOR = auto()       # FOR
-    KEYWORD_DO = auto()        # DO
-    KEYWORD_RETURN = auto()    # RETURN
-    KEYWORD_GO = auto()        # G или GO
-    KEYWORD_QUIT = auto()      # Q или QUIT
-    KEYWORD_ERASE = auto()     # ERASE
+    KEYWORD_COMMENT = auto()
+    KEYWORD_ASK = auto()
+    KEYWORD_TYPE = auto()
+    KEYWORD_SET = auto()
+    KEYWORD_IF = auto()
+    KEYWORD_FOR = auto()
+    KEYWORD_DO = auto()
+    KEYWORD_RETURN = auto()
+    KEYWORD_GO = auto()
+    KEYWORD_QUIT = auto()
+    KEYWORD_ERASE = auto()
     
-    # Встроенные функции (можно выделить отдельно или считать идентификаторами)
     FUNCTION_FSIN = auto()
     FUNCTION_FCOS = auto()
     FUNCTION_FATN = auto()
@@ -33,12 +30,11 @@ class TokenType(Enum):
     FUNCTION_FABS = auto()
     FUNCTION_FSGN = auto()
     
-    # Идентификаторы (имена переменных)
     IDENTIFIER = auto()
     
     # Константы
-    NUMBER = auto()        # Числовая константа (целая или вещественная)
-    STRING = auto()        # Текстовая константа в кавычках
+    NUMBER = auto()
+    STRING = auto()
     
     # Операторы
     OPERATOR_PLUS = auto()      # +
@@ -54,17 +50,16 @@ class TokenType(Enum):
     DELIMITER_LPAREN = auto()   # (
     DELIMITER_RPAREN = auto()   # )
     DELIMITER_EXCLAM = auto()   # ! (перевод строки)
-    
-    # Специальные для IF с тремя метками (сами метки — числа, но разделители уже есть)
-    # Тут ничего дополнительно не нужно.
+
 
 class Token:
     """Представляет лексему с типом, значением и позицией в исходном коде."""
-    def __init__(self, token_type: TokenType, value: str, line: int, column: int):
+    def __init__(self, token_type: TokenType, value: str, line: int, column: int, error_string: str = ""):
         self.type = token_type
         self.value = value      # Строковое представление (например, "1.10", "A", "+")
         self.line = line        # Номер строки (начиная с 1)
         self.column = column    # Позиция в строке (начиная с 1)
+        self.error_string = error_string
 
     def __repr__(self):
-        return f"Token({self.type.name}, {repr(self.value)}, line={self.line}, col={self.column})"
+        return f"Token({self.type.name}, {repr(self.value)}, line={self.line}, col={self.column}, {self.error_string})"
