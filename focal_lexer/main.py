@@ -1,5 +1,10 @@
 import sys
-from .lexer import LexicalAnalyzer
+from pathlib import Path
+
+root = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(root))
+
+from focal_lexer.lexer import LexicalAnalyzer
 
 def main():
     if len(sys.argv) > 1:
