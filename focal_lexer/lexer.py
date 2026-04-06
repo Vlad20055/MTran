@@ -191,6 +191,10 @@ class LexicalAnalyzer:
         if expect_cmd:
             cmd_type = self._get_command_type(ident_up)
             if cmd_type != TokenType.IDENTIFIER:
+                # Если это комментарий, пропускаем весь текст до конца строки
+                if cmd_type == TokenType.KEYWORD_COMMENT:
+                    while self.pos < len(self.source) and self.peek() != '\n':
+                        self.advance()
                 return Token(cmd_type, ident, line, col)
             # Если не команда, то это идентификатор (синтаксическая ошибка, но лексер пропускает)
             return Token(TokenType.IDENTIFIER, ident, line, col)
