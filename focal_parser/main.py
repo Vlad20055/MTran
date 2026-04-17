@@ -4,7 +4,22 @@ from pathlib import Path
 root = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(root))
 
-from focal_parser.parser import parse_source, dump_ast, ParseError
+from focal_parser.parser import parse_source, dump_ast, ParseError, print_ast_tree
+
+
+# def main():
+#     if len(sys.argv) < 2:
+#         print('Usage: python3 focal_parser/main.py <source.foc>')
+#         return
+#     path = sys.argv[1]
+#     with open(path, 'r', encoding='utf-8') as f:
+#         source = f.read()
+#     try:
+#         program = parse_source(source)
+#         print('Parsed program successfully.')
+#         print(dump_ast(program))
+#     except ParseError as e:
+#         print(e)
 
 
 def main():
@@ -16,8 +31,9 @@ def main():
         source = f.read()
     try:
         program = parse_source(source)
-        print('Parsed program successfully.')
-        print(dump_ast(program))
+        print('Parsed program successfully.\n')
+        print("AST (ASCII tree):")
+        print(print_ast_tree(program))
     except ParseError as e:
         print(e)
 

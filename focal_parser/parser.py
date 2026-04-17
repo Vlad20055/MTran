@@ -452,6 +452,115 @@ def dump_ast(node: Any, indent: int = 0) -> str:
     return prefix + repr(node) + '\n'
 
 
+def print_ast_tree(node, prefix="", is_last=True, get_attrs=None):
+    """
+    Рекурсивно выводит AST в виде ASCII-дерева.
+    
+    :param node: узел AST (Program, Line, Statement, Expression и т.д.)
+    :param prefix: строка-префикс для текущей глубины (накапливается)
+    :param is_last: True, если этот узел последний среди своих братьев
+    :param get_attrs: функция для извлечения "важных" атрибутов узла (опционально)
+    """
+    if node is None:
+        return ""
+
+    # Определяем строковое представление узла
+    node_str = _node_label(node, get_attrs)
+
+    # Выбор символов ветвления
+    connector = "└── " if is_last else "├── "
+    result = prefix + connector + node_str + "\n"
+
+    # Вычисляем новый префикс для детей
+    child_prefix = prefix + ("    " if is_last else "│   ")
+
+    # Получаем дочерние узлы (поля датакласса или элементы списка)
+    children = _get_children(node)
+
+    # Рекурсивно выводим детей
+    for i, child in enumerate(children):
+        if child is None:
+            continue
+        is_last_child = (i == len(children) - 1)
+        result += print_ast_tree(child, child_prefix, is_last_child, get_attrs)
+
+    return result
+
+
+def _node_label(node, get_attrs=None):
+    """Формирует метку узла: имя класса + важные атрибуты."""
+    class_name = node.__class__.__name__
+    attrs = []
+
+    # Если передана функция получения атрибутов, используем её
+    if get_attrs:
+        attrs = get_attrs(node)
+    else:
+        # Стандартные правила для разных типов узлов
+        if isinstance(node, (NumberLiteral, StringLiteral)):
+            attrs.append(f'"{node.value}"')
+        elif isinstance(node, Identifier):
+            attrs.append(node.name)
+        elif isinstance(node, BinaryOp):
+            attrs.append(node.operator)
+        elif isinstance(node, UnaryOp):
+            attrs.append(node.operator)
+        elif isinstance(node, CallExpression):
+            attrs.append(node.name)
+        elif isinstance(node, VariableTarget):
+            attrs.append(node.name)
+        elif isinstance(node, ArrayTarget):
+            attrs.append(f"{node.name}[...]")
+        elif isinstance(node, Line):
+            if node.label:
+                attrs.append(f"label={node.label}")
+        elif isinstance(node, PrintItem):
+            if node.newline:
+                attrs.append("newline")
+        # Для остальных узлов можно добавить поля по умолчанию (например, оператор)
+        elif hasattr(node, 'operator') and node.operator:
+            attrs.append(node.operator)
+        elif hasattr(node, 'name') and node.name:
+            attrs.append(node.name)
+
+    if attrs:
+        return f"{class_name}({', '.join(attrs)})"
+    return class_name
+
+
+def _get_children(node):
+    """Возвращает список дочерних узлов для данного узла AST."""
+    children = []
+
+    # Списки
+    if isinstance(node, list):
+        return node
+
+    # Да-таклассы
+    if hasattr(node, '__dataclass_fields__'):
+        for field_name, field_def in node.__dataclass_fields__.items():
+            value = getattr(node, field_name)
+            if value is None:
+                continue
+            # Пропускаем поля, которые уже отображены в метке
+            if field_name in ('operator', 'name', 'value', 'label'):
+                continue
+            # Для каждого поля создаём фиктивный узел-обёртку? Нет, добавляем значение напрямую.
+            # Если значение – простой тип (строка, число), можно его проигнорировать,
+            # иначе добавить как дочерний узел.
+            if isinstance(value, (str, int, float, bool)):
+                continue
+            # Для списка – разворачиваем элементы
+            if isinstance(value, list):
+                children.extend(value)
+            else:
+                children.append(value)
+        return children
+
+    # Если не датакласс и не список, возвращаем пустой список
+    return []
+
+
 def parse_source(source: str) -> Program:
     parser = Parser(source)
     return parser.parse()

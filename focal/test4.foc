@@ -1,7 +1,4 @@
 10.01 a "Number",size
-10.12 i (size) 10.10, 10.10, 10.10
-10.10 t "List of prime numbers,!
-10.11 s ll = 3 + @
-10.12 s gt = .
-10.15 s lst = 3 + 55..55
-10.20 t pp, !
+10.15 s lst = 3 + 5
+10.16 s aa = 3 + 5 * 8
+10.20 t lst,aa, !
