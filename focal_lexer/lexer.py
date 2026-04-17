@@ -64,6 +64,9 @@ class LexicalAnalyzer:
         expect_cmd = self.expect_command
 
         # Число
+        if ch == '.' and (self.pos + 1 >= len(self.source) or not self.source[self.pos + 1].isdigit()):
+            self.advance()
+            return Token(TokenType.UNKNOWN, '.', start_line, start_col, "Пустая константа (точка без цифр)")
         if ch.isdigit() or (ch == '.' and len(self.source) > self.pos+1 and self.source[self.pos+1].isdigit()):
             tok = self.read_number(start_line, start_col)
             # Если число стояло в начале строки — это номер строки, после него ожидаем команду
